@@ -11,7 +11,7 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import { makeStyles } from '@material-ui/core/styles';
-import { useQuery } from '@apollo/react-hooks';
+import { useQuery,useLazyQuery} from '@apollo/react-hooks';
 import gql from "graphql-tag";
 import withApollo from './apollo-hoc'
 import {GET_POKEMON_INFO} from '../src/gql-const'
@@ -24,10 +24,37 @@ const useStyles = makeStyles({
     maxWidth: 345,
   },
 });
- 
- function list(){
-
+ //list component
+function ShowList({results}){
+  const classes = useStyles();
+  return(
+        <Grid
+          container
+          direction="row"
+          spacing={3}
+        >
+          {results.map((data,i)=>(
+            <Grid key={i}  item xs={6}>
+              <Card className={classes.root}>
+                <CardMedia
+                  component="img"
+                  alt="Contemplative Reptile"
+                  height="200"
+                  image={data.image}
+                  title="Contemplative Reptile"
+                />
+                <CardContent>
+                  <Typography gutterBottom variant="h5" component="h2">
+                    {data.name}
+                  </Typography>
+                </CardContent>    
+            </Card>
+            </Grid>
+          ))}         
+        </Grid>
+  )
  }
+ //index main component
  function Index() {
 
   const classes = useStyles();
@@ -44,35 +71,8 @@ const useStyles = makeStyles({
     });
   }
 
-  const { data, loading, error } =  useQuery(GET_POKEMON_INFO);
-
-  const getData = ()=>{
-    // <Query query={GET_POKEMON_INFO}>
-    //   {({ loading, error, data }) => {
-    //     if (loading) return "Loading...";
-    //     if (error) return `Error! ${error.message}`;
-    //     console.log('working')
-    //   }}
-    // </Query>
-    try{
-      console.log('click')
-      // const res = await axios(`${APIKEY}&s=${val.str}`);
-      // let result=res.data.Search;
-      
-
-      console.log(data);
-      if(data!=undefined){
-        setVal(prevState => {
-          return { ...prevState, results: data.pokemons}
-        });
-      }
-    }
-    catch(e){
-      console.log(e);
-    }
-
- };
-
+  //const { data, loading, error } =  useLazyQuery(GET_POKEMON_INFO);
+  const [getPokemon, { loading, data }] = useLazyQuery(GET_POKEMON_INFO);
   return (
       <Container  maxWidth="sm">
       <Box my={4} >
@@ -95,7 +95,7 @@ const useStyles = makeStyles({
           </Grid>
           
           <Grid item xs={3}>
-          <Button variant="contained" color="primary" onClick={getData} >
+          <Button variant="contained" color="primary" onClick={() => getPokemon()} >
             submit
           </Button>
           </Grid>
@@ -105,33 +105,7 @@ const useStyles = makeStyles({
         <Link href="/about" color="secondary">
           Go to the about page
         </Link>
-        <Grid
-          container
-          direction="row"
-          spacing={3}
-        >
-          {val.results.map((data,i)=>(
-            <Grid key={i}  item xs={6}>
-              <Card className={classes.root}>
-                <CardMedia
-                  component="img"
-                  alt="Contemplative Reptile"
-                  height="200"
-                  image={data.image}
-                  title="Contemplative Reptile"
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    {data.name}
-                  </Typography>
-                </CardContent>    
-            </Card>
-            </Grid>
-          ))}
-          
-        </Grid>
-          
-        
+        <ShowList results={data ? data.pokemons : []} />      
       </Box>
     </Container>
     
