@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState} from 'react';
 import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
@@ -6,16 +6,14 @@ import Link from '../src/Link';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Grid from '@material-ui/core/Grid';
-import axios from'axios';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import { makeStyles } from '@material-ui/core/styles';
-import { useQuery,useLazyQuery} from '@apollo/react-hooks';
+//gql imports
 import gql from "graphql-tag";
 import withApollo from './apollo-hoc'
 import {GET_POKEMON_INFO} from '../src/gql-const'
-import { Query } from '@apollo/react-components';
 //
 const APIKEY = 'http://www.omdbapi.com/?i=tt3896198&apikey=c0e3bc1c'
 
@@ -57,8 +55,6 @@ function ShowList({results}){
  //index main component
  function Index() {
 
-  const classes = useStyles();
-  
   const[val, setVal]= useState({
     str:'',
     results:[]
@@ -71,8 +67,7 @@ function ShowList({results}){
     });
   }
 
-  //const { data, loading, error } =  useLazyQuery(GET_POKEMON_INFO);
-  const [getPokemon, { loading, data }] = useLazyQuery(GET_POKEMON_INFO);
+  const [getPokemon, { loading, data,refetch }] = useLazyQuery(GET_POKEMON_INFO);
   return (
       <Container  maxWidth="sm">
       <Box my={4} >
@@ -95,7 +90,7 @@ function ShowList({results}){
           </Grid>
           
           <Grid item xs={3}>
-          <Button variant="contained" color="primary" onClick={() => getPokemon()} >
+          <Button variant="contained" color="primary" onClick={() => {!refetch ? getPokemon() : refetch();}} >
             submit
           </Button>
           </Grid>
