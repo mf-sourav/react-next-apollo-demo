@@ -10,10 +10,12 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import CardMedia from '@material-ui/core/CardMedia';
 import { makeStyles } from '@material-ui/core/styles';
+import Skeleton from '@material-ui/lab/Skeleton';
 //gql imports
+import { useLazyQuery } from "@apollo/react-hooks";
 import gql from "graphql-tag";
-import withApollo from './apollo-hoc'
-import {GET_POKEMON_INFO} from '../src/gql-const'
+import withApollo from '../lib/lib/apollo-hoc'
+import {GET_POKEMON_INFO} from '../gql/gql-const'
 //
 const APIKEY = 'http://www.omdbapi.com/?i=tt3896198&apikey=c0e3bc1c'
 
@@ -36,10 +38,10 @@ function ShowList({results}){
               <Card className={classes.root}>
                 <CardMedia
                   component="img"
-                  alt="Contemplative Reptile"
+                  alt={data.name}
                   height="200"
                   image={data.image}
-                  title="Contemplative Reptile"
+                  title="pokemon"
                 />
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="h2">
@@ -53,8 +55,8 @@ function ShowList({results}){
   )
  }
  //index main component
- function Index() {
-
+ function Index(props) {
+  
   const[val, setVal]= useState({
     str:'',
     results:[]
@@ -67,7 +69,14 @@ function ShowList({results}){
     });
   }
 
+
   const [getPokemon, { loading, data,refetch }] = useLazyQuery(GET_POKEMON_INFO);
+  const {cache} = props.apollo
+  const dt = cache.readQuery({
+    query: GET_POKEMON_INFO
+  });
+  console.log(dt)
+  // console.log(props.apollo.cache);
   return (
       <Container  maxWidth="sm">
       <Box my={4} >
@@ -79,7 +88,6 @@ function ShowList({results}){
           direction="row"
           spacing={3}
         >
-
           <Grid item xs={6}>
             <TextField id="outlined-basic" 
             label="Movie" 
@@ -100,6 +108,9 @@ function ShowList({results}){
         <Link href="/about" color="secondary">
           Go to the about page
         </Link>
+        {loading && <div>
+          <Skeleton variant="rect" width={288} height={304} />
+          </div>}
         <ShowList results={data ? data.pokemons : []} />      
       </Box>
     </Container>

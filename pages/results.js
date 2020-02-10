@@ -1,7 +1,7 @@
 import React from 'react'
 import { useQuery } from '@apollo/react-hooks';
 import gql from "graphql-tag";
-import withApollo from './apollo-hoc'
+import withApollo from '../lib/lib/apollo-hoc'
 
 // const cache = new InMemoryCache();
 // const link = new HttpLink({
